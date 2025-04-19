@@ -6,21 +6,20 @@
 #include "calcilist.h"
 #include "calcilist.tab.h"
 
-void yyerror(char*);
-
+void yyerror(char *s);
 %}
 
 %%
-"int"                     { return TYPE; }
-"float"                   { return TYPE; }
-"char"                    { return TYPE; }
-"double"                  { return TYPE; }
+"int"                     { yylval.str_val = strdup(yytext); return TYPE; }
+"float"                   { yylval.str_val = strdup(yytext); return TYPE; }
+"char"                    { yylval.str_val = strdup(yytext); return TYPE; }
+"double"                  { yylval.str_val = strdup(yytext); return TYPE; }
 "if"                      { return IF; }
 "else"                    { return ELSE; }
 "while"                   { return WHILE; }
-[a-zA-Z_][a-zA-Z0-9_]*    { yylval = NewNode(); strcpy(yylval->name, yytext); return ID; }
-[0-9][0-9]*               { yylval = NewNode(); yylval->value = atof(yytext); return NUM; }
-[0-9][0-9]*\.[0-9]+       { yylval = NewNode(); yylval->value = atof(yytext); return NUM; }
+[a-zA-Z_][a-zA-Z0-9_]*    { yylval.str_val = strdup(yytext); return ID; }
+[0-9][0-9]*               { yylval.num_val = atof(yytext); return NUM; }
+[0-9][0-9]*\.[0-9]+       { yylval.num_val = atof(yytext); return NUM; }
 \n                        { return *yytext; }
 "=="                      { return EQ; }
 "!="                      { return NEQ; }
@@ -37,8 +36,8 @@ void yyerror(char*);
 %%
 
 #ifdef STANDALONE_LEXER
-int main(void)
-{
-    while(yylex()!='q');
+int main(void) {
+    while (yylex() != 'q');
+    return 0;
 }
 #endif
